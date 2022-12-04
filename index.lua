@@ -26,8 +26,10 @@ game:GetService("Players").LocalPlayer.Character.DefaultCrossbow.WeaponEvent:Fir
 assert(Drawing, "Exploit not supported!")
 
 
-if getgenv().UnloadWX then
+if getgenv().IsInjectedWX == true then
     getgenv().UnloadWX()
+else
+    getgenv().IsInjectedWX = true
 end
 
 
@@ -36,6 +38,16 @@ local plrs = {}
 local MyUtil = {}
 local LibUtil = {}
 local connections = {}
+
+
+local workspace, repstorage, players = game:GetService("Workspace"), game:GetService("ReplicatedStorage"), game:GetService("Players")
+local player, camera = players.LocalPlayer, workspace.CurrentCamera
+
+local Lib = loadstring(game:HttpGet("https://pastebin.com/raw/JsdM2jiP", true))()
+Lib.options.underlinecolor = "rainbow"
+
+
+local Main, Misc, Visuals, Settings, Credits = Lib:CreateWindow("Main"), Lib:CreateWindow("Misc"), Lib:CreateWindow("Visuals"), Lib:CreateWindow("Settings"), Lib:CreateWindow("Credits")
 
 
 getgenv().UnloadWX = function()
@@ -52,16 +64,9 @@ getgenv().UnloadWX = function()
             end)
         end
     end
+
+    getgenv().IsInjectedWX = false
 end
-
-local workspace, repstorage, players = game:GetService("Workspace"), game:GetService("ReplicatedStorage"), game:GetService("Players")
-local player, camera = players.LocalPlayer, workspace.CurrentCamera
-
-local Lib = loadstring(game:HttpGet("https://pastebin.com/raw/JsdM2jiP", true))()
-Lib.options.underlinecolor = "rainbow"
-
-
-local Main, Misc, Visuals, Settings, Credits = Lib:CreateWindow("Main"), Lib:CreateWindow("Misc"), Lib:CreateWindow("Visuals"), Lib:CreateWindow("Settings"), Lib:CreateWindow("Credits")
 
 
 -- [[   Credits    ]] --
