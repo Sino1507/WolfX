@@ -1,28 +1,3 @@
--- Wolf has: game:GetService("Workspace").Melvin.WolfTag in him...
--- Sheriff has: game:GetService("Workspace").Melvin.HunterTag
-
--- Wolf also stored = game:GetService("ReplicatedStorage").Wolves
--- Sheriff also stored = game:GetService("ReplicatedStorage").Hunters
-
-
--- The collactable item aka. more money thing: game:GetService("Workspace").EffectsBin.CollectableItem
-
---Fire Remote : game:GetService("Players").LocalPlayer.Backpack.DefaultCrossbow.WeaponEvent
---[[
-    local args = {
-    [1] = "Fire",
-    [2] = Vector3.new(-0.29962921142578125, 1.0731163024902344, -0.8499984741210938),
-    [3] = workspace.Model.Model.Part
-}
-
-game:GetService("Players").LocalPlayer.Character.DefaultCrossbow.WeaponEvent:FireServer(unpack(args))
-
-]]
-
--- Weapon in EffectsBin.Handle
-
--- Doors are stored in game:GetService("Workspace").MapHolder.Map."MAP".Door
-
 assert(Drawing, "Exploit not supported!")
 
 
@@ -80,7 +55,7 @@ end)
 
 function unloadESP(module)
     if module:IsA("Player") then
-        if module:FindFirstChild("Character") and module.Character:FindFirstChild("HumanoidRootPart") then
+        if module.Character and module.Character:FindFirstChild("HumanoidRootPart") then
             if module.Character.HumanoidRootPart:FindFirstChild("ChamWX") then
                 module.Character.HumanoidRootPart.ChamWX:Destroy()
             end
@@ -116,23 +91,11 @@ function unloadAllPlayersESP()
 end
 
 function unloadWolfESP()
-    for i, p in pairs(players:GetPlayers()) do
-        if p ~= player then
-            if p:FindFirstChild("Character") and p.Character:FindFirstChild("WolfTag") then
-                unloadESP(p)
-            end
-        end
-    end
+    unloadESP(MyUtil["Wolf"])
 end
 
 function unloadSheriffESP()
-    for i, p in pairs(players:GetPlayers()) do
-        if p ~= player then
-            if p:FindFirstChild("Character") and p.Character:FindFirstChild("HunterTag") then
-                unloadESP(p)
-            end
-        end
-    end
+    unloadESP(MyUtil["Hunter"])
 end
 
 function unloadCollectableESP()
@@ -260,12 +223,12 @@ function esp(toDisplay, color, opacity)
     -- We will also check if the item is a 'Player' and if it is, we will check if the item is a 'LocalPlayer'. If it is, we will not create a 'BoxHandleAdornment' for it.
     if #toDisplay == #players:GetPlayers() then
         for i,v in pairs(toDisplay) do
-            if v and v.Parent then
+            if v then
                 if v:IsA("Player") then
                     if v ~= player and v ~= MyUtil["Wolf"] and v ~= MyUtil["Hunter"] then
-                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                            if v.Character:FindFirstChild("ChamWX") then
-                                v.Character.ChamWX:Destroy()
+                        if (v.Character) and v.Character:FindFirstChild("HumanoidRootPart") then
+                            if v.Character.HumanoidRootPart:FindFirstChild("ChamWX") then
+                                v.Character.HumanoidRootPart.ChamWX:Destroy()
                             end
 
                             local cham = Instance.new("BoxHandleAdornment")
@@ -287,9 +250,9 @@ function esp(toDisplay, color, opacity)
             if v and v.Parent then
                 if v:IsA("Player") then
                     if v ~= player then
-                        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                            if v.Character:FindFirstChild("ChamWX") then
-                                v.Character.ChamWX:Destroy()
+                        if (v.Character) and v.Character:FindFirstChild("HumanoidRootPart") then
+                            if v.Character.HumanoidRootPart:FindFirstChild("ChamWX") then
+                                v.Character.HumanoidRootPart.ChamWX:Destroy()
                             end
 
                             local cham = Instance.new("BoxHandleAdornment")
@@ -301,6 +264,8 @@ function esp(toDisplay, color, opacity)
                             cham.Transparency = opacity
                             cham.Color3 = color
                             cham.Name = 'ChamWX'
+
+                            --print("[WX] Created cham for: " .. v.Name)
                         end
                     end
                 else
@@ -325,7 +290,7 @@ function esp(toDisplay, color, opacity)
 end
 
 table.insert(connections, game:GetService("RunService").RenderStepped:Connect(function()
-    if game.Players.LocalPlayer:FindFirstChild("Character") then
+    if (game.Players.LocalPlayer.Character) and (game.Players.LocalPlayer.Character.Humanoid) then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = MyUtil["WalkSpeed"]
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = MyUtil["JumpPower"]
     end
@@ -344,28 +309,41 @@ table.insert(connections, game:GetService("RunService").RenderStepped:Connect(fu
         end
     end
 
-    if MyUtil["Hunter"] == "" then
+    if not MyUtil["Hunter"].Character then
         for i, v in pairs(game.Players:GetPlayers()) do
-            if v and v.Name ~= player.Name and v.Character:FindFirstChildOfClass("Tool") or v and v.Name ~= player.Name and #v.Backpack:GetChildren() > 0 then
-                MyUtil["Hunter"] = players:FindFirstChild(v.Name)
+            if v and v.Name ~= player.Name and v.Character then
+                for i, obj in pairs(v.Character:GetChildren()) do
+                    if obj:IsA("Tool") and obj:FindFirstChild("WeaponEvent") then
+                        MyUtil["Hunter"] = v
+                    end
+                end
+            end
+            if not (MyUtil["Hunter"].Character) then
+                if #v.Backpack:GetChildren() > 0 then
+                    for i, obj in pairs(v.Backpack:GetChildren()) do
+                        if obj:IsA("Tool") and obj:FindFirstChild("WeaponEvent") then
+                            MyUtil["Hunter"] = v
+                        end
+                    end
+                end
             end
         end
     end
 
     
-    if MyUtil["WolfESP"] and MyUtil["Wolf"] ~= "" and MyUtil["Wolf"].Character and not MyUtil["Wolf"].Character.HumanoidRootPart:FindFirstChild("ChamWX") then
+    if MyUtil["WolfESP"] and MyUtil["Wolf"] ~= "" and (MyUtil["Wolf"].Character) and MyUtil["Wolf"].Character:FindFirstChild("HumanoidRootPart") and not MyUtil["Wolf"].Character.HumanoidRootPart:FindFirstChild("ChamWX") then
         local wolf = {MyUtil["Wolf"]}
         esp(wolf, Color3.fromRGB(255, 0, 0), 0.5)
     end
 
-    if MyUtil["SheriffESP"] and MyUtil["Hunter"] ~= "" and MyUtil["Hunter"].Character and not MyUtil["Hunter"].Character.HumanoidRootPart:FindFirstChild("ChamWX") then
+    if MyUtil["SheriffESP"] and MyUtil["Hunter"] ~= "" and (MyUtil["Hunter"].Character) and MyUtil["Hunter"].Character:FindFirstChild("HumanoidRootPart") and not MyUtil["Hunter"].Character.HumanoidRootPart:FindFirstChild("ChamWX") then
         local sheriff = {MyUtil["Hunter"]}
         esp(sheriff, Color3.fromRGB(0, 0, 255), 0.5)
     end
 
     if MyUtil["PlayersESP"] then
-        local players = players:GetPlayers()
-        esp(players, Color3.fromRGB(0, 255, 0), 0.5)
+        local all = players:GetChildren()
+        esp(all, Color3.fromRGB(0, 255, 0), 0.5)
     end
 
     if MyUtil["DroppedGunESP"] and workspace.EffectsBin:FindFirstChild("Handle") and not workspace.EffectsBin.Handle:FindFirstChild("ChamWX") then
