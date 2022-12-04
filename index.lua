@@ -78,6 +78,74 @@ Credits:Button("Copy UI Lib", function()
 end)
 
 
+function unloadESP(module)
+    if module:IsA("Player") then
+        if module:FindFirstChild("Character") and module.Character:FindFirstChild("HumanoidRootPart") then
+            if module.Character.HumanoidRootPart:FindFirstChild("ChamWX") then
+                module.Character.HumanoidRootPart.ChamWX:Destroy()
+            end
+        end
+    else
+        if module and module:FindFirstChild("ChamWX") then
+            module.ChamWX:Destroy()
+        end
+    end
+end
+
+function unloadAllESP()
+    for i, p in pairs(players:GetPlayers()) do
+        if p ~= player then
+            unloadESP(p)
+        end
+    end
+
+    if workspace.EffectsBin:FindFirstChild("CollectableItem") then
+        unloadESP(workspace.EffectsBin.CollectableItem)
+    end
+    if workspace.EffectsBin:FindFirstChild("Handle") then
+        unloadESP(workspace.EffectsBin.Handle)
+    end
+end
+
+function unloadAllPlayersESP()
+    for i, p in pairs(players:GetPlayers()) do
+        if p ~= player and p ~= MyUtil["Wolf"] and p ~= MyUtil["Hunter"] then
+            unloadESP(p)
+        end
+    end
+end
+
+function unloadWolfESP()
+    for i, p in pairs(players:GetPlayers()) do
+        if p ~= player then
+            if p:FindFirstChild("Character") and p.Character:FindFirstChild("WolfTag") then
+                unloadESP(p)
+            end
+        end
+    end
+end
+
+function unloadSheriffESP()
+    for i, p in pairs(players:GetPlayers()) do
+        if p ~= player then
+            if p:FindFirstChild("Character") and p.Character:FindFirstChild("HunterTag") then
+                unloadESP(p)
+            end
+        end
+    end
+end
+
+function unloadCollectableESP()
+    if workspace.EffectsBin:FindFirstChild("CollectableItem") then
+        unloadESP(workspace.EffectsBin.CollectableItem)
+    end
+end
+
+function unloadWeaponESP()
+    if workspace.EffectsBin:FindFirstChild("Handle") then
+        unloadESP(workspace.EffectsBin.Handle)
+    end
+end
 
 -- [[   Settings    ]] --
 Settings:Section("- KeyBinds -")
@@ -93,10 +161,12 @@ Settings:Button('Destroy UI', function()
 end)
 Settings:Button('Destroy Script', function()
     getgenv().UnloadWX()
+    unloadAllESP()
 end)
 Settings:Section('- Default -')
 Settings:Button('Reset Script', function()
     getgenv().UnloadWX()
+    unloadAllESP()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Sino1507/WolfX/main/index.lua", true))()
 end)
 
@@ -132,18 +202,30 @@ Visuals:Toggle("Wolf ESP", {location = LibUtil, default = false, flag = "WolfESP
     print("[WX] Wolf ESP: " .. x)
 
     MyUtil["WolfESP"] = s
+
+    if s == false then
+        unloadWolfESP()
+    end
 end)
 Visuals:Toggle("Sheriff ESP", {location = LibUtil, default = false, flag = "SheriffESP"}, function(s)
     local x = s and "On" or "Off"
     print("[WX] Sheriff ESP: " .. x)
 
     MyUtil["SheriffESP"] = s
+
+    if s == false then
+        unloadSheriffESP()
+    end
 end)
 Visuals:Toggle("Players ESP", {location = LibUtil, default = false, flag = "PlayersESP"}, function(s)
     local x = s and "On" or "Off"
     print("[WX] Players ESP: " .. x)
 
     MyUtil["PlayersESP"] = s
+
+    if s == false then
+        unloadAllPlayersESP()
+    end
 end)
 Visuals:Section("- Item ESP -")
 Visuals:Toggle("Dropped Gun ESP", {location = LibUtil, default = false, flag = "DroppedGunESP"}, function(s)
@@ -151,12 +233,20 @@ Visuals:Toggle("Dropped Gun ESP", {location = LibUtil, default = false, flag = "
     print("[WX] Dropped Gun ESP: " .. x)
 
     MyUtil["DroppedGunESP"] = s
+
+    if s == false then
+        unloadWeaponESP()
+    end
 end)
 Visuals:Toggle("Golden Bag ESP", {location = LibUtil, default = false, flag = "GoldenBagESP"}, function(s)
     local x = s and "On" or "Off"
     print("[WX] Golden Bag ESP: " .. x)
 
     MyUtil["GoldenBagESP"] = s
+
+    if s == false then
+        unloadCollectableESP()
+    end
 end)
 
 
