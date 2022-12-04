@@ -1,9 +1,42 @@
+-- Wolf has: game:GetService("Workspace").Melvin.WolfTag in him...
+-- Sheriff has: game:GetService("Workspace").Melvin.HunterTag
+
+-- Wolf also stored = game:GetService("ReplicatedStorage").Wolves
+-- Sheriff also stored = game:GetService("ReplicatedStorage").Hunters
+
+
+-- The collactable item aka. more money thing: game:GetService("Workspace").EffectsBin.CollectableItem
+
+--Fire Remote : game:GetService("Players").LocalPlayer.Backpack.DefaultCrossbow.WeaponEvent
+--[[
+    local args = {
+    [1] = "Fire",
+    [2] = Vector3.new(-0.29962921142578125, 1.0731163024902344, -0.8499984741210938),
+    [3] = workspace.Model.Model.Part
+}
+
+game:GetService("Players").LocalPlayer.Character.DefaultCrossbow.WeaponEvent:FireServer(unpack(args))
+
+]]
+
+-- Weapon in EffectsBin.Handle
+
+-- Doors are stored in game:GetService("Workspace").MapHolder.Map."MAP".Door
+
 assert(Drawing, "Exploit not supported!")
 
 
 if getgenv().UnloadWX then
     getgenv().UnloadWX()
 end
+
+
+
+local plrs = {}
+local MyUtil = {}
+local LibUtil = {}
+local connections = {}
+
 
 getgenv().UnloadWX = function()
     plrs = {}
@@ -20,12 +53,6 @@ getgenv().UnloadWX = function()
         end
     end
 end
-
-local plrs = {}
-local MyUtil = {}
-local LibUtil = {}
-local connections = {}
-
 
 local workspace, repstorage, players = game:GetService("Workspace"), game:GetService("ReplicatedStorage"), game:GetService("Players")
 local player, camera = players.LocalPlayer, workspace.CurrentCamera
@@ -65,7 +92,7 @@ end)
 Settings:Section('- Default -')
 Settings:Button('Reset Script', function()
     getgenv().UnloadWX()
-    loadstring(game:HttpGet("https://pastebin.com/raw/8XZ2XZ2r", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Sino1507/WolfX/main/index.lua", true))()
 end)
 
 
@@ -203,7 +230,7 @@ function esp(toDisplay, color, opacity)
 end
 
 table.insert(connections, game:GetService("RunService").RenderStepped:Connect(function()
-    if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+    if game.Players.LocalPlayer:FindFirstChild("Character") then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = MyUtil["WalkSpeed"]
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = MyUtil["JumpPower"]
     end
